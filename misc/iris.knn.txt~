@@ -1,4 +1,4 @@
-##KNN classifier template
+##Sharon Melmon KNN classifier template
 ###change
 library(class)
 library(ggplot2)
