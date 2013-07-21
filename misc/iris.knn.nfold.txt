@@ -1,0 +1,51 @@
+##Find knn classifier for n-folds
+
+#PREPROCESSING
+library(class)
+library(ggplot2)
+data<-iris
+labels<-data$Species
+data$Species<-NULL
+nrows<-150
+#set.seed(1)
+	
+
+#DEFINE TRAINING AND TEST SETS
+	train.index<-sample(1:150,150)
+	test.data1<-train.index[1:30]
+	train.data1<-train.index[31:150]	
+	test.data2<-train.index[31:60]
+	train.data2<-append(train.index[1:30], train.index[61:150]) 
+	test.data3<-train.index[61:90]
+	train.data3<-append(train.index[1:60], train.index[91:150]) 
+	test.data4<-train.index[91:120]
+	train.data4<-append(train.index[1:90], train.index[121:150]) 
+	test.data5<-train.index[121:150]
+	train.data5<-train.index[1:120]
+
+	train.data.all<-append(train.data1,train.data2,train.data3,train.data4,train.data5)
+
+# 	train.labels<-as.factor(as.matrix(labels)[train.index,])
+# 			test.labels<-as.factor(as.matrix(labels)[-train.index,])
+			err.rates<-data.frame()		
+		
+#APPLY KNN	
+			k<-10
+				knn.fit<-knn(train=train.data.all,
+				 test=test.data,
+				 cl=train.labels,
+				 k=k
+			)
+			cat('\n','k=',k,' ,train.pct=',train.pct,'\n',sep='')
+			print(table(test.labels,knn.fit))
+		
+			this.err<-sum(test.labels !=knn.fit)
+			err.rates<-rbind(err.rates,this.err)
+	
+			results<-data.frame(1:max.n,err.rates)
+			names(results)<-c('n','err.rate')
+	
+
+#AVERAGE THE PREDICTIONS FROM ALL MODELS
+final.results<- average(results)
+	
