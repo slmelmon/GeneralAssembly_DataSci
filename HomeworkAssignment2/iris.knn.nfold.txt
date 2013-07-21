@@ -1,0 +1,65 @@
+###FIND KNN CLASSIFIER BASED ON THE AVERAGE OF FIVE FOLDS###
+
+#PREPROCESSING
+library(class)
+library(ggplot2)
+data<-iris
+labels<-data$Species
+data$Species<-NULL
+nrows<-150
+
+	
+#RANDOMLY RE-ORDER DATA SET
+train.index<-sample(1:150,150)
+
+#DEFINE TRAINING AND TEST SETS FOR FIVE FOLDS
+test.data1<-train.index[1:30]
+train.data1<-train.index[31:150]	
+
+test.data2<-train.index[31:60]
+train.data2<-append(train.index[1:30], train.index[61:150]) 
+
+test.data3<-train.index[61:90]
+train.data3<-append(train.index[1:60], train.index[91:150]) 
+
+test.data4<-train.index[91:120]
+train.data4<-append(train.index[1:90], train.index[121:150]) 
+
+test.data5<-train.index[121:150]
+train.data5<-train.index[1:120]
+
+#COMBINE ALL TRAIN SETS 
+train.data.all<-append(train.data1,train.data2,train.data3,train.data4,train.data5)
+
+#COMBINE ALL TEST SETS
+test.data.all<-append(test.data1,test.data2,test.data3,test.data4,test.data5)
+
+#LABELS
+train.labels<-as.factor(as.matrix(labels)[train.index.all,])
+test.labels<-as.factor(as.matrix(labels)[test.index.all,])
+
+err.rates<-data.frame()		
+		
+#APPLY KNN FOR 10 NEAREST NEAREST NEIGHBORS
+#Ideally, the optimal value for k would be determined apriori based on least squares error.
+#For simplification, a k-value of 10 was assumed.
+max.k<-10
+	for(k in 1:max.k)		
+	{
+		knn.fit<-knn(train=train.data.all,
+		test=test.data.all,
+		cl=train.labels.all,
+		k=k
+			)
+	cat('\n','k=',k,' ,\n',sep='')
+	print(table(test.labels.all,knn.fit))
+
+	this.err<-sum(test.labels.all !=knn.fit)
+	err.rates<-rbind(err.rates,this.err)
+
+	results<-data.frame(1:max.k,err.rates)
+	names(results)<-c('k','err.rate')
+	}
+	
+#AVERAGE THE PREDICTIONS FROM ALL MODELS
+final.results<- average(results)
